@@ -1,0 +1,23 @@
+{
+  "name": "scroll-animate",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~48.0.11",
+    "expo-status-bar": "~1.4.4",
+    "faker": "^6.6.6",
+    "react": "18.2.0",
+    "react-native": "0.71.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@faker-js/faker": "^7.6.0"
+  },
+  "private": true
+}
