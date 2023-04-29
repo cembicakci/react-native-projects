@@ -9,6 +9,8 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import Svg, { Rect } from 'react-native-svg'
 import { LinearGradient } from 'expo-linear-gradient'
 
+const AnimatedSvg = Animated.createAnimatedComponent(Svg)
+
 const { width, height } = Dimensions.get('window');
 
 const SPACING = 10;
@@ -50,13 +52,27 @@ export default function App() {
           data={movies}
           keyExtractor={item => item.key}
           renderItem={({ item, index }) => {
+            if (!item.backdrop) return null;
+
+            const inputRange = [(index - 2) * ITEM_SIZE, (index - 1) * ITEM_SIZE]
+            const translateX = scrollX.interpolate({
+              inputRange,
+              outputRange: [-width, 0]
+            })
+
+
             return (
               <MaskedView
                 style={{ position: 'absolute' }}
                 maskElement={
-                  <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+                  <AnimatedSvg
+                    width={width}
+                    height={height}
+                    viewBox={`0 0 ${width} ${height}`}
+                    style={{ transform: [{ translateX }] }}
+                  >
                     <Rect x='0' y='0' width={width} height={height} fill={'red'} />
-                  </Svg>
+                  </AnimatedSvg>
                 }
               >
                 <Image source={{ uri: item.backdrop }} style={styles.backdropImage} />
@@ -102,7 +118,7 @@ export default function App() {
           ]
           const translateY = scrollX.interpolate({
             inputRange,
-            outputRange: [0, -50, 0]
+            outputRange: [100, 50, 100]
           })
 
           return (
