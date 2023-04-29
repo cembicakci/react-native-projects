@@ -1,13 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StatusBar, Text, View, StyleSheet, FlatList, Dimensions, Image, Animated } from 'react-native';
 import { getMovies } from './api';
+
 import Genres from './Genres';
 import Rating from './Rating';
+
+import MaskedView from '@react-native-masked-view/masked-view';
+import Svg, { Rect } from 'react-native-svg'
+import { LinearGradient } from 'expo-linear-gradient'
 
 const { width, height } = Dimensions.get('window');
 
 const SPACING = 10;
 const ITEM_SIZE = width * 0.72;
+const SPACER_ITEM_SIZE = (width - ITEM_SIZE) / 2
 
 const Loading = () => (
   <View style={styles.loadingContainer}>
@@ -25,7 +31,7 @@ export default function App() {
   useEffect(() => {
     const fetchData = async () => {
       const movies = await getMovies();
-      setMovies(movies);
+      setMovies([{ key: 'left-spacer' }, ...movies, { key: 'right-spacer' }]);
     };
 
     if (movies.length === 0) {
@@ -37,9 +43,37 @@ export default function App() {
     return <Loading />;
   }
 
+  const Backdrop = ({ movies, scrollX }) => {
+    return (
+      <View style={styles.backdrop}>
+        <FlatList
+          data={movies}
+          keyExtractor={item => item.key}
+          renderItem={({ item, index }) => {
+            return (
+              <MaskedView
+                style={{ position: 'absolute' }}
+                maskElement={
+                  <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+                    <Rect x='0' y='0' width={width} height={height} fill={'red'} />
+                  </Svg>
+                }
+              >
+                <Image source={{ uri: item.backdrop }} style={styles.backdropImage} />
+              </MaskedView>
+            )
+          }}
+        />
+        <LinearGradient colors={['transparent', 'white']}
+          style={{ width: width, height: height * 0.6, position: 'absolute', bottom: 0 }} />
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
+      <Backdrop movies={movies} scrollX={scrollX} />
       <Animated.FlatList
         showsHorizontalScrollIndicator={false}
         data={movies}
@@ -57,11 +91,14 @@ export default function App() {
         scrollEventThrottle={16} //16 fps
 
         renderItem={({ item, index }) => {
+          if (!item.poster) {
+            return <View style={{ width: SPACER_ITEM_SIZE }} />
+          }
 
           const inputRange = [
-            (index - 1) * ITEM_SIZE, //prev item
-            index * ITEM_SIZE, //curr item
-            (index + 1) * ITEM_SIZE //next item
+            (index - 2) * ITEM_SIZE, //prev item
+            (index - 1) * ITEM_SIZE, //curr item
+            (index) * ITEM_SIZE //next item
           ]
           const translateY = scrollX.interpolate({
             inputRange,
@@ -117,4 +154,14 @@ const styles = StyleSheet.create({
     margin: 0,
     marginBottom: 10,
   },
+  backdrop: {
+    position: 'absolute',
+    width: width,
+    height: height * 0.6
+  },
+  backdropImage: {
+    width: width,
+    height: height * 0.6,
+    resizeMode: 'cover'
+  }
 });
