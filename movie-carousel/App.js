@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StatusBar, Text, View, StyleSheet, FlatList, Dimensions, Image, Animated } from 'react-native';
 import { getMovies } from './api';
 import Genres from './Genres';
@@ -17,9 +17,12 @@ const Loading = () => (
 
 
 export default function App() {
-  const [movies, setMovies] = React.useState([]);
-  const scrollX = React.useRef(new Animated.Value(0)).current;
-  React.useEffect(() => {
+
+  const [movies, setMovies] = useState([]);
+
+  const scrollX = useRef(new Animated.Value(0)).current
+
+  useEffect(() => {
     const fetchData = async () => {
       const movies = await getMovies();
       setMovies(movies);
@@ -37,44 +40,57 @@ export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar hidden />
-      <FlatList
+      <Animated.FlatList
         showsHorizontalScrollIndicator={false}
         data={movies}
         keyExtractor={(item) => item.key}
         horizontal
+        snapToInterval={ITEM_SIZE}
+        decelerationRate={0}
         contentContainerStyle={{
           alignItems: 'center',
         }}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16} //16 fps
+
         renderItem={({ item, index }) => {
+
+          const inputRange = [
+            (index - 1) * ITEM_SIZE, //prev item
+            index * ITEM_SIZE, //curr item
+            (index + 1) * ITEM_SIZE //next item
+          ]
+          const translateY = scrollX.interpolate({
+            inputRange,
+            outputRange: [0, -50, 0]
+          })
+
           return (
             <View style={{ width: ITEM_SIZE }}>
-              <View
+              <Animated.View
                 style={{
                   marginHorizontal: SPACING,
                   padding: SPACING * 2,
                   alignItems: 'center',
                   backgroundColor: 'white',
                   borderRadius: 34,
+                  transform: [{ translateY }]
                 }}
               >
-                <Image
-                  source={{ uri: item.poster }}
-                  style={styles.posterImage}
-                />
-                <Text style={{ fontSize: 24 }} numberOfLines={1}>
-                  {item.title}
-                </Text>
+                <Image source={{ uri: item.poster }} style={styles.posterImage} />
+                <Text style={{ fontSize: 24 }} numberOfLines={1}>{item.title}</Text>
                 <Rating rating={item.rating} />
                 <Genres genres={item.genres} />
-                <Text style={{ fontSize: 12 }} numberOfLines={3}>
-                  {item.description}
-                </Text>
-              </View>
+                <Text style={{ fontSize: 12 }} numberOfLines={3}>{item.description}</Text>
+              </Animated.View>
             </View>
           );
         }}
       />
-    </View>
+    </View >
   );
 }
 

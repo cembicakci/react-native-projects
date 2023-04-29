@@ -1,7 +1,5 @@
 import { API_KEY } from './config';
 
-console.log(API_KEY)
-
 const genres = {
     12: 'Adventure',
     14: 'Fantasy',
@@ -51,6 +49,6 @@ export const getMovies = async () => {
             genres: genre_ids.map((genre) => genres[genre]),
         })
     );
-
+    
     return movies;
 };

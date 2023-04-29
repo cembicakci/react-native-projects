@@ -18,7 +18,11 @@ export default function Rating({ rating }) {
 }
 
 const styles = StyleSheet.create({
-    ratingNumber: { marginRight: 4, fontFamily: 'Menlo', fontSize: 14 },
+    ratingNumber: {
+        marginRight: 4,
+        fontFamily: 'Menlo',
+        fontSize: 14
+    },
     rating: {
         flexDirection: 'row',
         alignItems: 'center',
