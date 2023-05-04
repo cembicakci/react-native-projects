@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg'
 
@@ -11,6 +11,7 @@ import MaskedView from '@react-native-community/masked-view';
 const { width, height } = Dimensions.get('screen')
 
 const AnimatedPolygon = Animated.createAnimatedComponent(Polygon)
+const AnimatedAntDesign = Animated.createAnimatedComponent(AntDesign)
 
 const Button = ({ title, onPress, style }) => {
   return (
@@ -24,6 +25,9 @@ const fromCoords = { x: 0, y: height }
 const toCoords = { x: width, y: 0 }
 
 const Drawer = ({ onPress, animatedValue }) => {
+
+  const [selectedRoute, setSelectedRoute] = useState(routes[0])
+
   const polygonRef = React.useRef()
 
   React.useEffect(() => {
@@ -35,11 +39,24 @@ const Drawer = ({ onPress, animatedValue }) => {
       }
     })
   })
+
+  const translateX = animatedValue.x.interpolate({
+    inputRange: [0, width],
+    outputRange: [-100, 0]
+  })
+
+  const opacity = animatedValue.x.interpolate({
+    inputRange: [0, width],
+    outputRange: [0, 1]
+  })
+
   return (
     <MaskedView
       style={{ flex: 1 }}
       maskElement={
-        <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+        <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{
+          backgroundColor: 'transparent'
+        }}>
           <AnimatedPolygon
             ref={polygonRef}
             fill={'red'}
@@ -57,7 +74,7 @@ const Drawer = ({ onPress, animatedValue }) => {
           style={{ position: 'absolute', top: 40, right: 30 }}
         />
 
-        <View style={styles.menu}>
+        <Animated.View style={[styles.menu, { opacity, transform: [{ translateX }] }]}>
           <View>
             {routes.map((route, index) => {
               return (
@@ -65,8 +82,11 @@ const Drawer = ({ onPress, animatedValue }) => {
                   label={route}
                   key={route}
                   title={route}
-                  onPress={onPress}
-                  style={[styles.button, { color: colors[index] }]}
+                  onPress={() => {
+                    onPress()
+                    setSelectedRoute(route)
+                  }}
+                  style={[styles.button, { color: colors[index], textDecorationLine: route === selectedRoute ? 'line-through' : 'none' }]}
                 />
               );
             })}
@@ -88,7 +108,7 @@ const Drawer = ({ onPress, animatedValue }) => {
               );
             })}
           </View>
-        </View>
+        </Animated.View>
 
       </View>
     </MaskedView>
@@ -101,28 +121,34 @@ export default function App() {
   const animate = (toValue) => {
     return Animated.timing(animatedValue, {
       toValue: toValue === 1 ? toCoords : fromCoords,
-      duration: 2000,
+      duration: 200,
       useNativeDriver: true
     })
   }
 
   const onCloseDrawer = React.useCallback(() => {
-
+    animate(0).start()
   }, [])
 
   const onOpenDrawer = React.useCallback(() => {
     animate(1).start()
   }, [])
 
+  const translateX = animatedValue.y.interpolate({
+    inputRange: [0, height * 0.3],
+    outputRange: [100, 0],
+    extrapolate: 'clamp'
+  })
+
   return (
     <View style={styles.container}>
       <Drawer onPress={onCloseDrawer} animatedValue={animatedValue} />
-      <AntDesign
+      <AnimatedAntDesign
         onPress={onOpenDrawer}
         name='menufold'
         size={32}
         color='#222'
-        style={{ position: 'absolute', top: 40, right: 30 }}
+        style={{ transform: [{ translateX }], position: 'absolute', top: 40, right: 30 }}
       />
     </View>
   );
