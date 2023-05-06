@@ -1,0 +1,1 @@
+<img src='./img/movie-carousel.png' width='250px'/>
