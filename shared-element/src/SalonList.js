@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Dimensions, 
 import { data } from './data'
 import { colors } from './colors'
 
-import { SharedElement } from 'react-native-shared-element';
+import { SharedElement } from 'react-navigation-shared-element';
 
 const { width, height } = Dimensions.get('screen')
 
@@ -28,9 +28,15 @@ const SalonList = ({ navigation }) => {
                                     />
                                 </SharedElement>
 
-                                <Text style={styles.name}>{item.name.first} {item.name.last}</Text>
+                                <SharedElement id={`item.${item.id.value}.name`} >
+                                    <Text style={styles.name}>{item.name.first} {item.name.last}</Text>
+                                </SharedElement>
+
                                 <Text style={styles.city}>{item.location.city}</Text>
-                                <Image source={{ uri: item.picture.large }} style={styles.image} />
+
+                                <SharedElement id={`item.${item.id.value}.image`} style={styles.image}>
+                                    <Image source={{ uri: item.picture.large }} style={styles.image} />
+                                </SharedElement>
                             </View>
                         </TouchableOpacity>
                     )
@@ -47,11 +53,13 @@ export default SalonList
 const styles = StyleSheet.create({
     name: {
         fontWeight: '700',
-        fontSize: 18
+        fontSize: 18,
+        position: 'absolute'
     },
     city: {
         fontSize: 11,
-        opacity: 0.7
+        opacity: 0.7,
+        marginTop: 18 * 1.3
     },
     image: {
         width: ITEM_HEIGHT * 0.8,

@@ -6,7 +6,7 @@ import { detailsIcon } from './detailsIcon';
 
 import * as Animatable from 'react-native-animatable';
 
-import { SharedElement } from 'react-native-shared-element';
+import { SharedElement } from 'react-navigation-shared-element';
 
 const { width, height } = Dimensions.get('screen')
 const DURATION = 400;
@@ -27,8 +27,13 @@ const SalonListDetail = ({ navigation, route }) => {
                     <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors[0], height: TOP_HEADER_HEIGHT + 32 }]} />
                 </SharedElement>
 
-                <Text style={styles.name}>{item.name.first} {item.name.last}</Text>
-                <Image source={{ uri: item.picture.large }} style={styles.image} />
+                <SharedElement id={`item.${item.id.value}.name`}>
+                    <Text style={styles.name}>{item.name.first} {item.name.last}</Text>
+                </SharedElement>
+
+                <SharedElement id={`item.${item.id.value}.image`} style={styles.image}>
+                    <Image source={{ uri: item.picture.large }} style={styles.image} />
+                </SharedElement>
 
             </View>
             <View style={styles.bg}>
@@ -90,18 +95,6 @@ const SalonListDetail = ({ navigation, route }) => {
         </View>
     )
 }
-
-
-SalonListDetail.sharedElements = (route, otherRoute, showing) => {
-    const { item } = route.params
-    return [
-        {
-            id: `item.${item.id.value}.bg`,
-        }
-    ]
-
-}
-
 
 export default SalonListDetail
 
