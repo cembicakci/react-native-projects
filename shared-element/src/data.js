@@ -46,7 +46,7 @@ export const data = [
         "cell": "067-4843-656",
         "id": {
             "name": "SID",
-            "value": "343914574"
+            " ": "343914574"
         },
         "picture": {
             "large": "https://randomuser.me/api/portraits/men/50.jpg",
