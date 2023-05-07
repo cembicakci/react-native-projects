@@ -1,22 +1,22 @@
-import { useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Animated } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { StyleSheet, Text, View, Animated, Button, Pressable, SafeAreaView, TouchableOpacity } from 'react-native';
 
 const getRandomMessage = () => {
   const number = Math.trunc(Math.random() * 10000);
   return `Random Message: ${number}`
 }
 
-const Message = ({ text }) => {
+const Message = (props) => {
   const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
       Animated.timing(opacity, {
         toValue: 1,
-        duration: 500,
+        duration: 200,
         useNativeDriver: true
       }),
-      Animated.delay(200),
+      Animated.delay(2000),
       Animated.timing(opacity, {
         toValue: 0,
         duration: 500,
@@ -36,16 +36,37 @@ const Message = ({ text }) => {
         })
       }]
     }]}>
-      <Text>{text}</Text>
+      <Text>{props.text}</Text>
     </Animated.View>
   );
 }
 
-export default App = () => {
+export default () => {
+
+  const [messages, setMessages] = useState([])
+
   return (
-    <View style={styles.container}>
-      <Message text={'Bu bir testtir!'} />
-    </View>
+    <SafeAreaView>
+      <View style={styles.container}>
+        {
+          messages.map((message, index) => (
+            <Message
+              text={message}
+              key={`${index}-message`}
+            />
+          ))
+        }
+      </View>
+
+      <Button
+        title="Add message"
+        onPress={() => {
+          const message = getRandomMessage();
+          setMessages([...messages, message]);
+        }}
+      />
+
+    </SafeAreaView>
   )
 }
 
@@ -56,7 +77,7 @@ const styles = StyleSheet.create({
     top: 45,
     left: 0,
     right: 0
-  },  
+  },
   message: {
     margin: 10,
     marginBottom: 5,
