@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, Animated, Button, Pressable, SafeAreaView, TouchableOpacity } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+
 
 const getRandomMessage = () => {
   const number = Math.trunc(Math.random() * 10000);
   return `Random Message: ${number}`
 }
 
-const Message = (props) => {
+const Message = ({ text, status }) => {
   const opacity = useRef(new Animated.Value(0)).current;
+
+  const iconName = status === 'success' ? `checkcircleo` : status === 'error' ? 'closecircleo' : 'infocirlceo'
 
   useEffect(() => {
     Animated.sequence([
@@ -34,9 +38,17 @@ const Message = (props) => {
           inputRange: [0, 1],
           outputRange: [-20, 0],
         })
-      }]
+      }],
+      backgroundColor: status === 'success' ? 'green' : status === 'error' ? 'red' : 'orange'
     }]}>
-      <Text>{props.text}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <AntDesign
+          name={iconName}
+          size={24}
+          color="#fff"
+        />
+        <Text style={{ color: '#fff', marginLeft: 10 }}>{text}</Text>
+      </View>
     </Animated.View>
   );
 }
@@ -46,13 +58,14 @@ export default () => {
   const [messages, setMessages] = useState([])
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <View style={styles.container}>
         {
           messages.map((message, index) => (
             <Message
               text={message}
               key={`${index}-message`}
+              status={'error'}
             />
           ))
         }
@@ -65,7 +78,6 @@ export default () => {
           setMessages([...messages, message]);
         }}
       />
-
     </SafeAreaView>
   )
 }
@@ -81,8 +93,8 @@ const styles = StyleSheet.create({
   message: {
     margin: 10,
     marginBottom: 5,
-    backgroundColor: '#fff',
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 15,
     borderRadius: 4,
     shadowColor: '#000',
     shadowOffset: {
