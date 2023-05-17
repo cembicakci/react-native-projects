@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { Image, Animated, Text, View, Dimensions, StyleSheet, StatusBar, SafeAreaView, ScrollView } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import data from './data'
@@ -8,10 +8,25 @@ const getImage = (i) => `https://source.unsplash.com/600x${400 + i}/?blackandwhi
 const { width, height } = Dimensions.get('screen');
 
 export default function App() {
+
+  const [bottomActions, setBottomActions] = useState(null)
+
+  const scrollY = useRef(new Animated.Value(0)).current
+
+  const topEdge = bottomActions?.y - height + bottomActions?.height
+
+  console.log(scrollY)
+
   return (
     <SafeAreaView>
       <StatusBar hidden />
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <Animated.ScrollView
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        contentContainerStyle={{ padding: 20 }}
+      >
         <Text style={styles.heading}>Black and White</Text>
         {data.map((text, index) => {
           return (
@@ -21,7 +36,12 @@ export default function App() {
             </View>
           )
         })}
-        <View style={styles.bottomActions} />
+        <View
+          style={styles.bottomActions}
+          onLayout={ev => {
+            setBottomActions(ev.nativeEvent.layout)
+          }}
+        />
         <View>
           <Text style={styles.featuredTitle}>Featured</Text>
           {
@@ -35,8 +55,14 @@ export default function App() {
             })
           }
         </View>
-      </ScrollView>
-      <View style={[styles.bottomActions, { paddingHorizontal: 20 }]}>
+      </Animated.ScrollView>
+      <View style={[styles.bottomActions, {
+        paddingHorizontal: 20,
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0
+      }]}>
         <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', justifyContent: 'center' }}>
           <Entypo name='adjust' size={24} color='black' style={{ marginHorizontal: 10 }} />
           <Text>326</Text>
