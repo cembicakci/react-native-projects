@@ -9,13 +9,14 @@ const { width, height } = Dimensions.get('screen');
 
 export default function App() {
 
-  const [bottomActions, setBottomActions] = useState(null)
+  const [bottomActions, setBottomActions] = useState()
+  console.log('bottomActions', bottomActions)
 
   const scrollY = useRef(new Animated.Value(0)).current
 
-  const topEdge = bottomActions?.y - height + bottomActions?.height
+  const topEdge = bottomActions?.y - height + bottomActions?.height + 45
 
-  console.log(scrollY)
+  const inputRange = [-1, 0, topEdge - 1, topEdge, topEdge + 1]
 
   return (
     <SafeAreaView>
@@ -28,19 +29,19 @@ export default function App() {
         contentContainerStyle={{ padding: 20 }}
       >
         <Text style={styles.heading}>Black and White</Text>
-        {data.map((text, index) => {
-          return (
-            <View key={index}>
-              {index % 3 === 0 && <Image source={{ uri: getImage(index) }} style={styles.image} />}
-              <Text style={styles.paragraph}>{text}</Text>
-            </View>
-          )
-        })}
+        {
+          data.map((text, index) => {
+            return (
+              <View key={index}>
+                {index % 3 === 0 && <Image source={{ uri: getImage(index) }} style={styles.image} />}
+                <Text style={styles.paragraph}>{text}</Text>
+              </View>
+            )
+          })
+        }
         <View
-          style={styles.bottomActions}
-          onLayout={ev => {
-            setBottomActions(ev.nativeEvent.layout)
-          }}
+          style={[styles.bottomActions, { backgroundColor: 'red' }]}
+          onLayout={event => { setBottomActions(event.nativeEvent.layout) }}
         />
         <View>
           <Text style={styles.featuredTitle}>Featured</Text>
@@ -56,29 +57,38 @@ export default function App() {
           }
         </View>
       </Animated.ScrollView>
-      <View style={[styles.bottomActions, {
-        paddingHorizontal: 20,
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0
-      }]}>
-        <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', justifyContent: 'center' }}>
-          <Entypo name='adjust' size={24} color='black' style={{ marginHorizontal: 10 }} />
-          <Text>326</Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={[styles.icon]}>
-            <Entypo name='export' size={24} color='black' />
+      {
+        bottomActions &&
+        <Animated.View style={[styles.bottomActions, {
+          paddingHorizontal: 20,
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          transform: [{
+            translateY: scrollY.interpolate({
+              inputRange,
+              outputRange: [0, 0, 0, 0, -1]
+            })
+          }]
+        }]}>
+          <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', justifyContent: 'center' }}>
+            <Entypo name='adjust' size={24} color='black' style={{ marginHorizontal: 10 }} />
+            <Text>326</Text>
           </View>
-          <View style={[styles.icon]}>
-            <Entypo name='credit' size={24} color='green' />
+          <View style={{ flexDirection: 'row' }}>
+            <View style={[styles.icon]}>
+              <Entypo name='export' size={24} color='black' />
+            </View>
+            <View style={[styles.icon]}>
+              <Entypo name='credit' size={24} color='green' />
+            </View>
+            <View style={[styles.icon]}>
+              <Entypo name='share-alternative' size={24} color='black' />
+            </View>
           </View>
-          <View style={[styles.icon]}>
-            <Entypo name='share-alternative' size={24} color='black' />
-          </View>
-        </View>
-      </View>
+        </Animated.View>
+      }
     </SafeAreaView>
   )
 }
@@ -94,7 +104,7 @@ const styles = StyleSheet.create({
   },
   bottomActions: {
     height: 80,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     alignItems: 'center',
     justifyContent: 'space-between',
     flexDirection: 'row',
