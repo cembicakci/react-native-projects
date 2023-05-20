@@ -10,13 +10,12 @@ const { width, height } = Dimensions.get('screen');
 export default function App() {
 
   const [bottomActions, setBottomActions] = useState()
-  console.log('bottomActions', bottomActions)
 
   const scrollY = useRef(new Animated.Value(0)).current
 
-  const topEdge = bottomActions?.y - height + bottomActions?.height + 45
+  const topEdge = bottomActions?.y - height + bottomActions?.height + 47
 
-  const inputRange = [-1, 0, topEdge - 1, topEdge, topEdge + 1]
+  const inputRange = [-1, 0, topEdge - 30, topEdge, topEdge + 1]
 
   return (
     <SafeAreaView>
@@ -74,18 +73,44 @@ export default function App() {
         }]}>
           <View style={{ flexDirection: 'row', height: 60, alignItems: 'center', justifyContent: 'center' }}>
             <Entypo name='adjust' size={24} color='black' style={{ marginHorizontal: 10 }} />
-            <Text>326</Text>
+            <Animated.Text
+              style={{
+                opacity: scrollY.interpolate({
+                  inputRange,
+                  outputRange: [0, 0, 0, 1, 1]
+                })
+              }}
+            >
+              326
+            </Animated.Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
-            <View style={[styles.icon]}>
+            <Animated.View style={[styles.icon, {
+              opacity: scrollY.interpolate({
+                inputRange,
+                outputRange: [0, 0, 0, 1, 1]
+              })
+            }]}>
               <Entypo name='export' size={24} color='black' />
-            </View>
-            <View style={[styles.icon]}>
+            </Animated.View>
+            <Animated.View style={[styles.icon, {
+              transform: [{
+                translateX: scrollY.interpolate({
+                  inputRange,
+                  outputRange: [60, 60, 60, 0, 0]
+                })
+              }]
+            }]}>
               <Entypo name='credit' size={24} color='green' />
-            </View>
-            <View style={[styles.icon]}>
+            </Animated.View>
+            <Animated.View style={[styles.icon, {
+              opacity: scrollY.interpolate({
+                inputRange,
+                outputRange: [0, 0, 0, 1, 1]
+              })
+            }]}>
               <Entypo name='share-alternative' size={24} color='black' />
-            </View>
+            </Animated.View>
           </View>
         </Animated.View>
       }
@@ -104,7 +129,7 @@ const styles = StyleSheet.create({
   },
   bottomActions: {
     height: 80,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     alignItems: 'center',
     justifyContent: 'space-between',
     flexDirection: 'row',
