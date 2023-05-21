@@ -1,12 +1,15 @@
 import React from 'react'
-import { SafeAreaView, StyleSheet } from 'react-native'
+import { Keyboard, SafeAreaView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
 import AppInput from './src/component/AppInput'
 
 const App = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <AppInput text={'Enter your email'} />
-    </SafeAreaView>
+    <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss() }}>
+      <SafeAreaView style={styles.container}>
+        <AppInput text={'Enter your name'} />
+        <AppInput text={'Enter your email'} />
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   )
 }
 
@@ -18,5 +21,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  inputContainer: {
+    marginTop: 12
   }
 })
