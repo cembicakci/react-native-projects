@@ -1,5 +1,5 @@
 import React from 'react'
-import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SimpleLineIcons } from '@expo/vector-icons';
 
 import data from './data';
@@ -103,8 +103,22 @@ const App = () => {
     <View style={styles.container}>
       <StatusBar hidden />
       <ConnectWithText />
+
+      <FlatList
+        data={data}
+        keyExtractor={(item) => { `${item.name}-${item.icon}` }}
+        bounces={false}
+        contentContainerStyle={{
+          paddingTop: height / 2 - ITEM_HEIGHT / 2,
+          paddingBottom: height / 2 - ITEM_HEIGHT / 2,
+          padding: 20
+        }}
+        renderItem={({ item }) => {
+          return <Item {...item} color={colors.yellow} showText />
+        }}
+      />
       <ConnectButton onPress={onConnectPress} />
-      <Item {...data[0]} color={colors.yellow} />
+      <Item />
     </View>
   )
 }
