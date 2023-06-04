@@ -93,7 +93,7 @@ const ConnectButton = React.memo(({ onPress }) => {
 });
 
 //in order to get 'ref' of flatlist, used forwardRef
-const List = React.forwardRef(({ color, showText, style, onScroll }, ref) => {
+const List = React.forwardRef(({ color, showText, style, onScroll, onItemIndexChange }, ref) => {
   return (
     <Animated.FlatList
       style={style}
@@ -113,6 +113,13 @@ const List = React.forwardRef(({ color, showText, style, onScroll }, ref) => {
       }}
       renderItem={({ item }) => {
         return <Item {...item} color={color} showText={showText} />
+      }}
+      onMomentumScrollEnd={ev => {
+        const newIndex = Math.round(ev.nativeEvent.contentOffset.y / ITEM_HEIGHT)
+
+        if (onItemIndexChange) {
+          onItemIndexChange(newIndex)
+        }
       }}
     />
   )
@@ -134,6 +141,8 @@ const App = () => {
     { useNativeDriver: true }
   )
 
+  const onItemIndexChange = React.useCallback(setIndex, [])
+
   React.useEffect(() => {
     scrollY.addListener((v) => {
       if (darkRef?.current) {
@@ -154,6 +163,7 @@ const App = () => {
         color={colors.yellow}
         style={StyleSheet.absoluteFillObject}
         onScroll={onScroll}
+        onItemIndexChange={onItemIndexChange}
       />
       <List
         ref={darkRef}
