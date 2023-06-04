@@ -103,6 +103,8 @@ const List = React.forwardRef(({ color, showText, style, onScroll }, ref) => {
       bounces={false}
       scrollEnabled={!showText}
       scrollEventThrottle={16}
+      snapToInterval={ITEM_HEIGHT}
+      decelerationRate={'fast'}
       onScroll={onScroll}
       contentContainerStyle={{
         paddingTop: showText ? 0 : height / 2 - ITEM_HEIGHT / 2,
@@ -132,10 +134,21 @@ const App = () => {
     { useNativeDriver: true }
   )
 
+  React.useEffect(() => {
+    scrollY.addListener((v) => {
+      if (darkRef?.current) {
+        darkRef.current.scrollToOffset({
+          offset: v.value,
+          animated: false
+        })
+      }
+    })
+  })
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
-      {/* <ConnectWithText /> */}
+      <ConnectWithText />
       <List
         ref={yellowRef}
         color={colors.yellow}
@@ -152,7 +165,7 @@ const App = () => {
           height: ITEM_HEIGHT,
           top: height / 2 - ITEM_HEIGHT / 2,
         }} />
-      {/* <ConnectButton onPress={onConnectPress} /> */}
+      <ConnectButton onPress={onConnectPress} />
       <Item />
     </View>
   )
