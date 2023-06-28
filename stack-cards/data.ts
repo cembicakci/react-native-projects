@@ -25,6 +25,42 @@ export default [
         to: '6:00 PM',
         duration: 2,
         distance: 19.7
+    },
+    {
+        id: '4',
+        role: 'Expeditor',
+        type: 'Subcontractor',
+        from: '8:16 AM',
+        to: '6:00 PM',
+        duration: 2,
+        distance: 19.7
+    },
+    {
+        id: '5',
+        role: 'Trencher',
+        type: 'Construction',
+        from: '8:16 AM',
+        to: '6:00 PM',
+        duration: 2,
+        distance: 19.7
+    },
+    {
+        id: '6',
+        role: 'Construction Expeditor',
+        type: 'Expeditor',
+        from: '8:16 AM',
+        to: '6:00 PM',
+        duration: 2,
+        distance: 19.7
+    },
+    {
+        id: '7',
+        role: 'Excavator',
+        type: 'Surveyor',
+        from: '8:16 AM',
+        to: '6:00 PM',
+        duration: 2,
+        distance: 19.7
     }
 ]
 

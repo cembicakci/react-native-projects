@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Dimensions, Image, Alert } from 'react-native';
 
 import { Entypo } from '@expo/vector-icons'
 import { Directions, Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
-import { useSharedValue } from 'react-native-reanimated';
+import Animated, { Extrapolate, SharedValue, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import data, { locationImage } from './data';
 
@@ -26,9 +26,43 @@ const colors = {
   dark: '#111'
 }
 
-function Card({ info, index, totalLength }: { info: (typeof data)[0], index: number, totalLength: number }) {
+function Card({ info, index, totalLength, activeIndex }: { info: (typeof data)[0], index: number, totalLength: number, activeIndex: SharedValue<number> }) {
+
+  const stylez = useAnimatedStyle(() => {
+    return {
+      position: 'absolute',
+      zIndex: totalLength - index,
+      opacity: interpolate(
+        activeIndex.value,
+        [index - 1, index, index + 1],
+        [1 - 1 / maxVisibleItems, 1, 1]
+      ),
+      shadowOpacity: interpolate(activeIndex.value,
+        [index - 1, index, index + 1],
+        [0, 0, 1],
+        {
+          extrapolateRight: Extrapolate.CLAMP
+        }
+      ),
+      transform: [
+        {
+          translateY: interpolate(activeIndex.value,
+            [index - 1, index, index + 1],
+            [-layout.cardsGap, 0, layout.height - layout.cardsGap]
+          )
+        },
+        {
+          scale: interpolate(activeIndex.value,
+            [index - 1, index, index + 1],
+            [0.96, 1, 1]
+          )
+        }
+      ]
+    }
+  })
+
   return (
-    <View style={[styles.card]}>
+    <Animated.View style={[styles.card, stylez]}>
       <Text style={[
         styles.title,
         {
@@ -58,7 +92,7 @@ function Card({ info, index, totalLength }: { info: (typeof data)[0], index: num
         </View>
       </View>
       <Image source={{ uri: locationImage }} style={styles.locationImage} />
-    </View>
+    </Animated.View>
   )
 }
 
@@ -68,10 +102,18 @@ export default function App() {
   const activeIndex = useSharedValue(0)
 
   const flingUp = Gesture.Fling().direction(Directions.UP).onStart(() => {
+    if (activeIndex.value === 0) {
+      return;
+    }
+    activeIndex.value = withTiming(activeIndex.value - 1, { duration })
     console.log('fling up')
   })
 
   const flingDown = Gesture.Fling().direction(Directions.DOWN).onStart(() => {
+    if (activeIndex.value === data.length) {
+      return;
+    }
+    activeIndex.value = withTiming(activeIndex.value + 1, { duration })
     console.log('fling down')
   })
 
@@ -91,13 +133,14 @@ export default function App() {
         >
 
           {
-            data.slice(0, 1).map((c, index) => {
+            data.map((c, index) => {
               return (
                 <Card
                   info={c}
                   key={c.id}
                   index={index}
                   totalLength={data.length - 1}
+                  activeIndex={activeIndex}
                 />
               )
             })
@@ -119,15 +162,26 @@ const styles = StyleSheet.create({
     backgroundColor: colors.light,
     width: layout.width,
     height: layout.height,
-    padding: 20,
-    borderRadius: 12,
+    padding: layout.spacing,
+    borderRadius: layout.borderRadius,
+    shadowColor: colors.dark,
+    shadowRadius: 10,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 0,
+      height: 0
+    },
+    elevation: 5
   },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 12
   },
-  cardContent: {},
+  cardContent: {
+    gap: layout.spacing,
+    marginBottom: layout.spacing
+  },
   row: {
     flexDirection: 'row'
   },
@@ -137,7 +191,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {},
   locationImage: {
-    width: '100%',
-    height: 275
+    flex: 1
   }
 });
