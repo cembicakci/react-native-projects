@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Dimensions, Image } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Image, Alert } from 'react-native';
 
 import { Entypo } from '@expo/vector-icons'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { Directions, Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
+import { useSharedValue } from 'react-native-reanimated';
 
 import data, { locationImage } from './data';
 
@@ -63,32 +64,47 @@ function Card({ info, index, totalLength }: { info: (typeof data)[0], index: num
 
 
 export default function App() {
+
+  const activeIndex = useSharedValue(0)
+
+  const flingUp = Gesture.Fling().direction(Directions.UP).onStart(() => {
+    console.log('fling up')
+  })
+
+  const flingDown = Gesture.Fling().direction(Directions.DOWN).onStart(() => {
+    console.log('fling down')
+  })
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <StatusBar hidden />
-      <View style={{
-        alignItems: 'center',
-        flex: 1,
-        justifyContent: 'flex-end',
-        marginBottom: layout.cardsGap * 2,
-      }}
-        pointerEvents='box-none'
+      <GestureDetector
+        gesture={Gesture.Exclusive(flingUp, flingDown)}
       >
+        <View style={{
+          alignItems: 'center',
+          flex: 1,
+          justifyContent: 'flex-end',
+          marginBottom: layout.cardsGap * 2
+        }}
+          pointerEvents='box-none'
+        >
 
-        {
-          data.slice(0, 1).map((c, index) => {
-            return (
-              <Card
-                info={c}
-                key={c.id}
-                index={index}
-                totalLength={data.length - 1}
-              />
-            )
-          })
-        }
+          {
+            data.slice(0, 1).map((c, index) => {
+              return (
+                <Card
+                  info={c}
+                  key={c.id}
+                  index={index}
+                  totalLength={data.length - 1}
+                />
+              )
+            })
+          }
 
-      </View>
+        </View>
+      </GestureDetector>
     </GestureHandlerRootView>
   );
 }
@@ -96,7 +112,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary
+    backgroundColor: colors.primary,
+    paddingHorizontal: 16
   },
   card: {
     backgroundColor: colors.light,
