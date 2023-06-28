@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "initial-expo",
-    "slug": "initial-expo",
+    "name": "ts-starter",
+    "slug": "ts-starter",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
